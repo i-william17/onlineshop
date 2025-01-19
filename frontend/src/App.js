@@ -87,6 +87,8 @@ const App = () => {
 
   return (
     <BrowserRouter>
+    <div className='min-h-screen bg-white text-black'>
+
       {stripeApikey && (
         <Elements stripe={loadStripe(stripeApikey)}>
           <Routes>
@@ -348,7 +350,9 @@ const App = () => {
         pauseOnHover
         theme="dark"
       />
+      </div>
     </BrowserRouter>
+    
   );
 };
 

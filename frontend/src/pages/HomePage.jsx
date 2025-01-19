@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import AOS from 'aos';
-import 'aos/dist/aos.css'; // Import AOS styles
 import Header from '../components/Layout/Header';
 import Hero from '../components/Route/Hero/Hero';
 import Categories from '../components/Route/Categories/Categories';
@@ -11,7 +9,8 @@ import Sponsored from '../components/Route/Sponsored';
 import Footer from '../components/Layout/Footer';
 import ImageCarousel from '../components/Layout/ImageCarousel';
 import Engine from '../components/SupportEngine/Engine';
-import LoadingVideo from "../Assests/shop.mp4";
+import AOS from 'aos';
+import 'aos/dist/aos.css'; // Import AOS styles
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -37,25 +36,17 @@ const HomePage = () => {
   return (
     <div>
       {loading ? (
-        <div data-aos="fade-in" className={`fixed inset-0 flex items-center justify-center bg-black transition-opacity duration-1000 ${!loading ? 'opacity-0' : 'opacity-100'}`}>
-          <video
-            autoPlay
-            loop
-            muted
-            src={LoadingVideo}
-            type="video/mp4"
-            aria-label="Loading..."
-            className="w-full h-full object-cover"
-          ></video>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-16 h-16 border-4 border-t-4 border-t-indigo-500 border-gray-800 border-solid rounded-full animate-spin" ></div>
         </div>
       ) : (
-        <div data-aos="fade-in" className={`transition-opacity duration-10000 ${!loading ? 'opacity-100' : 'opacity-0'}`}>
-          <Header activeHeading={1} />
-          <Hero data-aos="fade-in" /> {/* Add AOS fade-up effect */}
+        <div className='overflow-hidden'>
+          <Header activeHeading={1} data-aos="fade-in" />
+          <Hero data-aos="fade-up" />
           <br />
           <hr className="border-black border-1" />
           <br />
-          <div data-aos="fade-in">
+          <div data-aos="fade-up">
             <ImageCarousel images={images} />
           </div>
           <div data-aos="fade-right">
@@ -73,10 +64,10 @@ const HomePage = () => {
           <div data-aos="fade-right">
             <Sponsored />
           </div>
-          <div data-aos="fade-up">
+          <div>
             <Engine />
           </div>
-          <Footer />
+          <Footer data-aos="fade-up" />
         </div>
       )}
     </div>

@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   AiFillHeart,
   AiFillStar,
@@ -7,20 +10,17 @@ import {
   AiOutlineShoppingCart,
   AiOutlineStar,
 } from "react-icons/ai";
-import { Link } from "react-router-dom";
 import styles from "../../../styles/styles";
-import { useDispatch, useSelector } from "react-redux";
 import ProductDetailsCard from "../ProductDetailsCard/ProductDetailsCard";
 import {
   addToWishlist,
   removeFromWishlist,
 } from "../../../redux/actions/wishlist";
-import { useEffect } from "react";
 import { addTocart } from "../../../redux/actions/cart";
 import { toast } from "react-toastify";
 import Ratings from "../../Products/Ratings";
 
-const ProductCard = ({ data,isEvent }) => {
+const ProductCard = ({ data, isEvent }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
   const [click, setClick] = useState(false);
@@ -61,82 +61,104 @@ const ProductCard = ({ data,isEvent }) => {
   };
 
   return (
-    <>
-      <div className="w-full h-[370px] bg-white rounded-lg shadow-sm p-3 relative cursor-pointer">
-        <div className="flex justify-end"></div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+      className="w-full h-[370px] relative group"
+    >
+      <div className="w-full h-full bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 overflow-hidden">
+        {/* Image Section */}
         <Link to={`${isEvent === true ? `/product/${data._id}?isEvent=true` : `/product/${data._id}`}`}>
-          <img
-            src={`${data.images && data.images[0]?.url}`}
-            alt=""
-            className="w-auto h-[170px] object-cover bg-center bg-contain"
-          />
-        </Link>
-        <Link to={`/shop/preview/${data?.shop._id}`}>
-          <h5 className={`${styles.shop_name}`}>{data.shop.name}</h5>
-        </Link>
-        <Link to={`${isEvent === true ? `/product/${data._id}?isEvent=true` : `/product/${data._id}`}`}>
-          <h4 className="pb-3 font-[500]">
-            {data.name.length > 40 ? data.name.slice(0, 40) + "..." : data.name}
-          </h4>
-
-          <div className="flex">
-          <Ratings rating={data?.ratings} />
+          <div className="relative w-full h-[170px] overflow-hidden rounded-lg mb-3 group">
+            <motion.img
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+              src={`${data.images && data.images[0]?.url}`}
+              alt={data.name}
+              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors duration-300" />
           </div>
+        </Link>
 
-          <div className="py-2 flex items-center justify-between">
-            <div className="flex">
-              <h5 className={`${styles.productDiscountPrice}`}>
-                sh {data.originalPrice === 0
-                  ? data.originalPrice
-                  : data.discountPrice}
-              </h5>
-              <h4 className={`${styles.price}`}>
-                sh {data.originalPrice ? data.originalPrice + " " : null}
-              </h4>
+        {/* Content Section */}
+        <div className="space-y-2">
+          <Link to={`/shop/preview/${data?.shop._id}`}>
+            <h5 className={`${styles.shop_name} hover:text-indigo-600 transition-colors duration-300`}>
+              {data.shop.name}
+            </h5>
+          </Link>
+
+          <Link to={`${isEvent === true ? `/product/${data._id}?isEvent=true` : `/product/${data._id}`}`}>
+            <h4 className="text-gray-800 font-medium line-clamp-2 hover:text-indigo-600 transition-colors duration-300">
+              {data.name}
+            </h4>
+
+            <div className="flex items-center space-x-1 mt-2">
+              <Ratings rating={data?.ratings} />
             </div>
-            <span className="font-[400] text-[17px] text-[#68d284]">
-              {data?.sold_out} sold
-            </span>
-          </div>
-        </Link>
 
-        {/* side options */}
-        <div>
-          {click ? (
-            <AiFillHeart
-              size={22}
-              className="cursor-pointer absolute right-2 top-5"
-              onClick={() => removeFromWishlistHandler(data)}
-              color={click ? "red" : "#333"}
-              title="Remove from wishlist"
-            />
-          ) : (
-            <AiOutlineHeart
-              size={22}
-              className="cursor-pointer absolute right-2 top-5"
-              onClick={() => addToWishlistHandler(data)}
-              color={click ? "red" : "#333"}
-              title="Add to wishlist"
-            />
-          )}
-          <AiOutlineEye
-            size={22}
-            className="cursor-pointer absolute right-2 top-14"
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center space-x-2">
+                <span className={`${styles.productDiscountPrice} text-indigo-600`}>
+                  sh {data.originalPrice === 0 ? data.originalPrice : data.discountPrice}
+                </span>
+                {data.originalPrice && (
+                  <span className={`${styles.price} text-gray-500 line-through`}>
+                    sh {data.originalPrice}
+                  </span>
+                )}
+              </div>
+              <span className="text-green-500 font-medium text-sm">
+                {data?.sold_out} sold
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="absolute right-4 top-4 flex flex-col items-center space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+            onClick={() => click ? removeFromWishlistHandler(data) : addToWishlistHandler(data)}
+            title={click ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            {click ? (
+              <AiFillHeart className="text-red-500" size={22} />
+            ) : (
+              <AiOutlineHeart className="text-gray-600" size={22} />
+            )}
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
             onClick={() => setOpen(!open)}
-            color="#333"
             title="Quick view"
-          />
-          <AiOutlineShoppingCart
-            size={25}
-            className="cursor-pointer absolute right-2 top-24"
+          >
+            <AiOutlineEye className="text-gray-600" size={22} />
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300"
             onClick={() => addToCartHandler(data._id)}
-            color="#444"
             title="Add to cart"
-          />
-          {open ? <ProductDetailsCard setOpen={setOpen} data={data} /> : null}
+          >
+            <AiOutlineShoppingCart className="text-gray-600" size={22} />
+          </motion.button>
         </div>
       </div>
-    </>
+
+      {/* Quick View Modal */}
+      {open && <ProductDetailsCard setOpen={setOpen} data={data} />}
+    </motion.div>
   );
 };
 
